@@ -1,8 +1,8 @@
-import json
+import uvicorn
+from fastapi import FastAPI
 
-with open('data1.json', 'r', encoding='utf-8') as f:
-    json_data = json.load(f)
+import routers
 
-with open("data.json", "w") as f:
-    f.write(json.dumps(json_data, indent=4, ensure_ascii=False))
-# print(json.dumps(json_data, indent=4, ensure_ascii=False))
+
+app = FastAPI()
+app.include_router(routers.app)
