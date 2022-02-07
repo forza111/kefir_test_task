@@ -15,7 +15,7 @@ import schemas
 app = APIRouter(tags=["notes"])
 
 
-@app.post("/login", response_model=schemas.LoginModel, responses={
+@app.post("/login", response_model=schemas.CurrentUserResponseModel, responses={
     400: {"model": schemas.ErrorResponseModel, "description": "Bad Request"},
 })
 async def login(body_user: schemas.LoginModel,db: Session = Depends(get_db)):
@@ -23,4 +23,9 @@ async def login(body_user: schemas.LoginModel,db: Session = Depends(get_db)):
     if user is None or not Authenticate.verify_password(body_user.password, user.password):
         return JSONResponse(status_code=400, content={"code": 400, "message": "Wrong login or password"})
     if Authenticate.verify_password(body_user.password, user.password):
-        return {"login": user.login, "password": user.password}
+        user_detail = user.user_detail
+        return {"first_name": user_detail.first_name, "last_name": user_detail.last_name,
+                "other_name": user_detail.other_name, "email": user_detail.email,
+                "phone": user_detail.phone, "birthday": user_detail.birthday,
+                "is_admin": user_detail.is_admin
+                }
