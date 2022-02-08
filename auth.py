@@ -1,6 +1,6 @@
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from fastapi import Depends,Request
+from fastapi import Depends,Request,Response
 from fastapi.templating import Jinja2Templates
 from jose import jwt
 
@@ -44,9 +44,10 @@ class Authenticate:
     def create_access_token(data: dict, request: Request):
         '''Token creation. The function accepts data in the form of a dictionary'''
         jwt_token = jwt.encode(data, dependencies.SECRET_KEY, algorithm=dependencies.ALGORITHM)
-        response = RedirectResponse(url="/")
-        response.set_cookie(key="access_token", value=f"Bearer {jwt_token}", httponly=True)
-        return response
+        return jwt_token
+        # response = Response()
+        # response.set_cookie(key="access_token", value=f"Bearer {jwt_token}", httponly=True)
+        # return {"first_name":"1", "last_name":"2", "other_name":'23', "email":'1', "phone":"123123", "birthday": '1994-03-02', "is_admin": True}
 
     @staticmethod
     def get_user(db: Session, user_id: int):

@@ -16,6 +16,9 @@ class User(Base):
     login = Column(String, unique=True, index=True)
     password = Column(String(60))
 
+    class Config:
+        orm_mode = True
+
 class UserDetail(Base):
     __tablename__ = "user_detail"
 
