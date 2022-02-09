@@ -15,7 +15,7 @@ import schemas
 app = APIRouter(tags=["notes"])
 
 
-@app.post("/login", response_model=schemas.LoginModel, responses={
+@app.post("/login", response_model=schemas.CurrentUserResponseModel, responses={
     400: {"model": schemas.ErrorResponseModel, "description": "Bad Request"},
 })
 async def login(request: Request,body_user: schemas.LoginModel,response: Response, db: Session = Depends(get_db)):
@@ -26,9 +26,18 @@ async def login(request: Request,body_user: schemas.LoginModel,response: Respons
         data = {"sub": body_user.login}
         token = Authenticate.create_access_token(data,request)
         response.set_cookie(key="access_token", value=f"Bearer {token}", httponly=True)
-        return user
+        return user.user_detail
 
-@app.get("/users/current")
+@app.get("/users/current", response_model=schemas.CurrentUserResponseModel)
 async def get_current_user(current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
                            db: Session = Depends(get_db)):
-    return current_user
+    if current_user is None:
+        return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
+    return current_user.user_detail
+
+@app.get("/users", response_model=schemas.UsersListResponseModel)
+async def get_users(page: int, size: int, current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
+                           db: Session = Depends(get_db)):
+    if current_user is None:
+        return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
+    return

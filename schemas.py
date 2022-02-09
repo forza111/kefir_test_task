@@ -29,6 +29,9 @@ class CurrentUserResponseModel(BaseModel):
     birthday: date
     is_admin: bool
 
+    class Config:
+        orm_mode = True
+
 class PrivateCreateUserModel(CurrentUserResponseModel):
     other_name: Optional[str] = None
     phone: Optional[str] = None
@@ -92,3 +95,6 @@ class HTTPValidationError(BaseModel):
 class LoginModel(BaseModel):
     login: str
     password: str
+
+    class Config:
+        orm_mode = True
