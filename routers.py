@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from auth import Authenticate
+import crud
 import models
 from database import get_db
 import schemas
@@ -40,4 +41,5 @@ async def get_users(page: int, size: int, current_user: schemas.LoginModel = Dep
                            db: Session = Depends(get_db)):
     if current_user is None:
         return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
-    return
+    users = crud.get_users(db, page, size)
+    return users

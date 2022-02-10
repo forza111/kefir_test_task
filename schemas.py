@@ -10,6 +10,9 @@ class UsersListElementModel(BaseModel):
     last_name: str
     email: str
 
+    class Config:
+        orm_mode = True
+
 class UpdateUserResponseModel(UsersListElementModel):
     other_name: str
     phone: str
