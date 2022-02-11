@@ -18,6 +18,9 @@ class UpdateUserResponseModel(UsersListElementModel):
     phone: str
     birthday: date
 
+    class Config:
+        orm_mode = True
+
 class PrivateDetailUserResponseModel(UpdateUserResponseModel):
     city: int
     additional_info: str
@@ -51,6 +54,9 @@ class UpdateUserModel(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     birthday: Optional[date] = None
+
+    class Config:
+        orm_mode = True
 
 class PrivateUpdateUserModel(UpdateUserModel):
     id: int
