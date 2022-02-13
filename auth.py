@@ -41,6 +41,14 @@ class Authenticate:
         return user
 
     @staticmethod
+    async def get_admin_user(request: Request,db: Session = Depends(database.get_db)):
+        current_user = Authenticate.get_current_user(request, db)
+        if current_user.user_detail.is_admin:
+            return current_user
+        else: return {"user": "not admin"}
+
+
+    @staticmethod
     def create_access_token(data: dict, request: Request):
         '''Token creation. The function accepts data in the form of a dictionary'''
         jwt_token = jwt.encode(data, dependencies.SECRET_KEY, algorithm=dependencies.ALGORITHM)

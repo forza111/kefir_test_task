@@ -32,8 +32,9 @@ class UserDetail(Base):
     phone = Column(String(12), nullable=False)
     birthday = Column(Date, nullable=False)
     is_admin = Column(BOOLEAN, default=False, nullable=False)
-    city_id = Column(Integer, ForeignKey(City.id))
-    city = relationship('City', backref=backref("user", uselist=False))
+    city = Column(Integer, ForeignKey(City.id))
+    city_detail = relationship('City', backref=backref("user", uselist=False))
+    additional_info = Column(String(100), nullable=True)
 
 
 

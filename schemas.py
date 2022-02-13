@@ -26,6 +26,9 @@ class PrivateDetailUserResponseModel(UpdateUserResponseModel):
     additional_info: str
     is_admin: bool
 
+    class Config:
+        orm_mode = True
+
 class CurrentUserResponseModel(BaseModel):
     first_name: str
     last_name: str
@@ -100,6 +103,9 @@ class ValidationError(BaseModel):
 
 class HTTPValidationError(BaseModel):
     detail: List[ValidationError] = None
+
+class HttpBaseError(BaseModel):
+    title: str
 
 class LoginModel(BaseModel):
     login: str
