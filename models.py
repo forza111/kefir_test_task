@@ -9,6 +9,9 @@ class City(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50))
 
+    class Config:
+        orm_mode = True
+
 class User(Base):
     __tablename__ = "users"
 
@@ -23,16 +26,15 @@ class UserDetail(Base):
     __tablename__ = "user_detail"
 
     id = Column(Integer, ForeignKey(User.id), primary_key=True, index=True)
-    # user_id = Column(Integer, ForeignKey(User.id), unique=True, nullable=False)
     user = relationship('User', backref=backref("user_detail", uselist=False))
     first_name = Column(String(40), nullable=False)
     last_name = Column(String(40), nullable=False)
-    other_name = Column(String(40), nullable=False)
-    email = Column(String(50), nullable=False)
-    phone = Column(String(12), nullable=False)
-    birthday = Column(Date, nullable=False)
-    is_admin = Column(BOOLEAN, default=False, nullable=False)
-    city = Column(Integer, ForeignKey(City.id))
+    other_name = Column(String(40), nullable=True)
+    email = Column(String(50), unique=True, nullable=False)
+    phone = Column(String(12), nullable=True)
+    birthday = Column(Date, nullable=True)
+    is_admin = Column(BOOLEAN, default=False, nullable=True)
+    city = Column(Integer, ForeignKey(City.id), nullable=True)
     city_detail = relationship('City', backref=backref("user", uselist=False))
     additional_info = Column(String(100), nullable=True)
 

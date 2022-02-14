@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 import paginate_sqlalchemy
 
 import models
+from auth import Authenticate
 
 
 def get_users(db: Session, page_n, size):
@@ -27,9 +28,25 @@ def get_user(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()
     return user
 
-def create_db_user(db: Session, create_user_body):
-    db_user = models.User(**create_user_body.dict())
+def create_db_user(db: Session, create_user_detail_body):
+    create_user_detail_body_dict = create_user_detail_body.dict()
+    create_user_body_dict = {"login": create_user_detail_body_dict.pop("login"),
+                             "password": Authenticate.get_password_hash(create_user_detail_body_dict.pop("password"))}
+    db_user = models.User(**create_user_body_dict)
     db.add(db_user)
     db.commit()
-    users = db.query(models.User).all()
-    return users
+    db.refresh(db_user)
+    create_user_detail_body_dict["id"] = db_user.id
+    user = create_db_user_detail(db, create_user_detail_body_dict)
+    return user
+
+def create_db_user_detail(db: Session, user_body):
+    db_user_detail = models.UserDetail(**user_body)
+    db.add(db_user_detail)
+    db.commit()
+    db.refresh(db_user_detail)
+    return db_user_detail
+
+def get_city(db: Session, id):
+    user = db.query(models.City).filter(models.City.id == id).first()
+    return user

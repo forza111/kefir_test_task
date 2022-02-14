@@ -53,9 +53,6 @@ class Authenticate:
         '''Token creation. The function accepts data in the form of a dictionary'''
         jwt_token = jwt.encode(data, dependencies.SECRET_KEY, algorithm=dependencies.ALGORITHM)
         return jwt_token
-        # response = Response()
-        # response.set_cookie(key="access_token", value=f"Bearer {jwt_token}", httponly=True)
-        # return {"first_name":"1", "last_name":"2", "other_name":'23', "email":'1', "phone":"123123", "birthday": '1994-03-02', "is_admin": True}
 
     @staticmethod
     def get_user(db: Session, user_id: int):
@@ -66,6 +63,11 @@ class Authenticate:
     def get_user_by_login(db: Session, login: str):
         '''Get user by login'''
         return db.query(models.User).filter(models.User.login == login).first()
+
+    @staticmethod
+    def get_user_detail_by_email(db: Session, email: str):
+        '''Get user by email'''
+        return db.query(models.UserDetail).filter(models.User.login == email).first()
 
     @staticmethod
     def get_password_hash(password):

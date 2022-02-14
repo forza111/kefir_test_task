@@ -21,10 +21,17 @@ class UpdateUserResponseModel(UsersListElementModel):
     class Config:
         orm_mode = True
 
-class PrivateDetailUserResponseModel(UpdateUserResponseModel):
-    city: int
-    additional_info: str
-    is_admin: bool
+class PrivateDetailUserResponseModel(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: str
+    other_name: str = None
+    phone: str = None
+    birthday: date = None
+    city: int = None
+    additional_info: str = None
+    is_admin: bool = None
 
     class Config:
         orm_mode = True
@@ -41,14 +48,18 @@ class CurrentUserResponseModel(BaseModel):
     class Config:
         orm_mode = True
 
-class PrivateCreateUserModel(CurrentUserResponseModel):
+class PrivateCreateUserModel(BaseModel):
+    login: str
+    password: str
+    first_name: str
+    last_name: str
+    email: str
     other_name: Optional[str] = None
     phone: Optional[str] = None
     birthday: Optional[date] = None
     city: Optional[int] = None
     additional_info: Optional[str] = None
     is_admin: Optional[bool] = None
-    password: str
 
 class UpdateUserModel(BaseModel):
     first_name: Optional[str] = None
