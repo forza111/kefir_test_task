@@ -3,6 +3,7 @@ import paginate_sqlalchemy
 
 import models
 from auth import Authenticate
+from fastapi import Response
 
 
 def get_users(db: Session, page_n, size):
@@ -24,8 +25,12 @@ def update_db_user(db: Session, id, update_user_body):
     users = db.query(models.UserDetail).get(id)
     return users
 
-def get_user(db: Session, pk):
+def get_user_detail(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()
+    return user
+
+def get_user(db: Session, pk):
+    user = db.query(models.User).filter(models.User.id == pk).first()
     return user
 
 def create_db_user(db: Session, create_user_detail_body):
@@ -50,3 +55,9 @@ def create_db_user_detail(db: Session, user_body):
 def get_city(db: Session, id):
     user = db.query(models.City).filter(models.City.id == id).first()
     return user
+
+def delete_user(db: Session, delete_user):
+    db.delete(delete_user)
+    db.commit()
+    db.close()
+    return Response(status_code=204)

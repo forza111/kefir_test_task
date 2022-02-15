@@ -24,9 +24,8 @@ class User(Base):
 
 class UserDetail(Base):
     __tablename__ = "user_detail"
-
-    id = Column(Integer, ForeignKey(User.id), primary_key=True, index=True)
-    user = relationship('User', backref=backref("user_detail", uselist=False))
+    id = Column(Integer, ForeignKey(User.id, ondelete="CASCADE"), primary_key=True, index=True)
+    user = relationship('User', backref=backref("user_detail", uselist=False, passive_deletes=True))
     first_name = Column(String(40), nullable=False)
     last_name = Column(String(40), nullable=False)
     other_name = Column(String(40), nullable=True)

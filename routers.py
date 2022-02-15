@@ -98,7 +98,7 @@ async def edit_user(
         ):
     if current_user is None:
         return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
-    request_user = crud.get_user(db, pk)
+    request_user = crud.get_user_detail(db, pk)
     if request_user is None:
         return JSONResponse(status_code=404, content={"title": "Response 404 Edit User Users  Pk  Patch"})
     if current_user.id != pk:
@@ -211,7 +211,48 @@ async def get_users(
         return JSONResponse(status_code=401, content={"title": "Response 401 Private Get User Private Users  Pk  Get"})
     if not current_user.user_detail.is_admin:
         return JSONResponse(status_code=403, content={"title": "Response 403 Private Get User Private Users  Pk  Get"})
-    user = crud.get_user(db,pk)
+    user = crud.get_user_detail(db,pk)
     if user is None:
         return JSONResponse(status_code=404, content={"title": "Response 404 Private Get User Private Users  Pk  Get"})
     return user
+
+@app.delete("/private/users/{pk}",
+            status_code=204,
+            responses={400: {"model": schemas.ErrorResponseModel,
+                             },
+                       401: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 401 Private Delete User Private Users  Pk  Delete"}
+                                 }
+                             }
+                             },
+                       403: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 403 Private Delete User Private Users  Pk  Delete"}
+                                 }
+                             }
+                             },
+                       404: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 404 Private Delete User Private Users  Pk  Delete"}
+                                 }
+                             }
+                             }
+                       }
+            )
+async def private_delete_user(
+        pk: int,
+        current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
+        db: Session = Depends(get_db)
+        ):
+    if current_user is None:
+        return JSONResponse(status_code=401, content={"title": "Response 401 Private Delete User Private Users  Pk  Delete"})
+    if not current_user.user_detail.is_admin:
+        return JSONResponse(status_code=403, content={"title": "Response 403 Private Delete User Private Users  Pk  Delete"})
+    delete_user = crud.get_user(db,pk)
+    if delete_user is None:
+        return JSONResponse(status_code=404, content={"title": "Response 404 Private Delete User Private Users  Pk  Delete"})
+    return crud.delete_user(db, delete_user)
