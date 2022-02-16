@@ -3,7 +3,9 @@ import paginate_sqlalchemy
 
 import models
 from auth import Authenticate
-from fastapi import Response
+from fastapi import Response, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+
 
 
 def get_users(db: Session, page_n, size):
@@ -25,12 +27,34 @@ def update_db_user(db: Session, id, update_user_body):
     user = db.query(models.UserDetail).get(id)
     return user
 
+def update_private_db_user(db: Session, id, update_user_body):
+    update_user_detail_body_dict = update_user_body.dict(exclude_defaults=True)
+    new_id = update_user_detail_body_dict.pop("id")
+    email = update_user_detail_body_dict.get("email")
+    if id != new_id:
+        db.query(models.User).filter(models.User.id == id).update({"id": new_id}, synchronize_session=False)
+        db.commit()
+    if email:
+        if get_user_by_email(db, email):
+            return JSONResponse(status_code=400, content={"code":400,
+                                                          "message": f"User with this email already exists"})
+    db.query(models.UserDetail).filter(models.UserDetail.id == id).update(update_user_detail_body_dict,
+                                                                          synchronize_session=False)
+    db.commit()
+    user = db.query(models.UserDetail).get(new_id)
+    return user
+
+
 def get_user_detail(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()
     return user
 
 def get_user(db: Session, pk):
     user = db.query(models.User).filter(models.User.id == pk).first()
+    return user
+
+def get_user_by_email(db: Session, email):
+    user = db.query(models.User).filter(models.UserDetail.email == email).first()
     return user
 
 def create_db_user(db: Session, create_user_detail_body):

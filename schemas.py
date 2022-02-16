@@ -72,8 +72,14 @@ class UpdateUserModel(BaseModel):
     class Config:
         orm_mode = True
 
-class PrivateUpdateUserModel(UpdateUserModel):
+class PrivateUpdateUserModel(BaseModel):
     id: int
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    other_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    birthday: Optional[date] = None
     city: Optional[int] = None
     additional_info: Optional[str] = None
     is_admin: Optional[bool] = None

@@ -29,6 +29,12 @@ async def login(request: Request,body_user: schemas.LoginModel,response: Respons
         response.set_cookie(key="access_token", value=f"Bearer {token}", httponly=True)
         return user.user_detail
 
+@app.get("/logout")
+async def logout(response: Response):
+    response.delete_cookie(key="access_token")
+    response.status_code = 200
+    return response
+
 @app.get("/users/current",
          response_model=schemas.CurrentUserResponseModel,
          responses={400: {"model": schemas.ErrorResponseModel,
@@ -292,12 +298,11 @@ async def private_patch_user(
         db: Session = Depends(get_db)
         ):
     if current_user is None:
-        return JSONResponse(status_code=401, content={"title": "Response 401 Private Patch User Private Users  Pk  Patch"})
+        return JSONResponse(status_code=401, content={"title": "Response 401 Private Patch User Private Users Pk Patch"})
     if not current_user.user_detail.is_admin:
-        return JSONResponse(status_code=403, content={"title": "Response 403 Private Patch User Private Users  Pk  Patch"})
-
+        return JSONResponse(status_code=403, content={"title": "Response 403 Private Patch User Private Users Pk Patch"})
     request_user = crud.get_user_detail(db, pk)
     if request_user is None:
-        return JSONResponse(status_code=404, content={"title": "Response 404 Edit User Users  Pk  Patch"})
-    update_user = crud.update_db_user(db, pk, update_user_body)
+        return JSONResponse(status_code=404, content={"title": "Response 404 Edit User Users Pk Patch"})
+    update_user = crud.update_private_db_user(db, pk, update_user_body)
     return update_user
