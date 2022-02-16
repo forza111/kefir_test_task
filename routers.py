@@ -256,3 +256,48 @@ async def private_delete_user(
     if delete_user is None:
         return JSONResponse(status_code=404, content={"title": "Response 404 Private Delete User Private Users  Pk  Delete"})
     return crud.delete_user(db, delete_user)
+
+
+@app.patch("/private/users/{pk}",
+          response_model=schemas.PrivateDetailUserResponseModel,
+          responses={400: {"model": schemas.ErrorResponseModel,
+                             },
+                       401: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 401 Private Patch User Private Users  Pk  Patch"}
+                                 }
+                             }
+                             },
+                       403: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 403 Private Patch User Private Users  Pk  Patch"}
+                                 }
+                             }
+                             },
+                       404: {"model": schemas.HttpBaseError,
+                             "content": {
+                                 "application/json": {
+                                     "example": {"title": "Response 404 Private Patch User Private Users  Pk  Patch"}
+                                 }
+                             }
+                             }
+                       }
+            )
+async def private_patch_user(
+        pk: int,
+        update_user_body: schemas.PrivateUpdateUserModel,
+        current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
+        db: Session = Depends(get_db)
+        ):
+    if current_user is None:
+        return JSONResponse(status_code=401, content={"title": "Response 401 Private Patch User Private Users  Pk  Patch"})
+    if not current_user.user_detail.is_admin:
+        return JSONResponse(status_code=403, content={"title": "Response 403 Private Patch User Private Users  Pk  Patch"})
+
+    request_user = crud.get_user_detail(db, pk)
+    if request_user is None:
+        return JSONResponse(status_code=404, content={"title": "Response 404 Edit User Users  Pk  Patch"})
+    update_user = crud.update_db_user(db, pk, update_user_body)
+    return update_user

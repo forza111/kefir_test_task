@@ -22,8 +22,8 @@ def update_db_user(db: Session, id, update_user_body):
     db.query(models.UserDetail).filter(models.UserDetail.id == id).update(update_user_body.dict(exclude_defaults=True),
                                                                           synchronize_session=False)
     db.commit()
-    users = db.query(models.UserDetail).get(id)
-    return users
+    user = db.query(models.UserDetail).get(id)
+    return user
 
 def get_user_detail(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()
