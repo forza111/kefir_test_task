@@ -305,7 +305,7 @@ COPY public.city (id, name) FROM stdin;
 --
 
 COPY public.user_detail (id, first_name, last_name, other_name, email, phone, birthday, is_admin, city, additional_info) FROM stdin;
-1	Nikita	Ionkin	\N	nikita@example.com	\N	\N	t	\N	\N
+1	Nikita	Ionkin	forza111	nikita@example.com	+7911911911	1994-06-03	t	1	i"m an engineer
 \.
 
 
