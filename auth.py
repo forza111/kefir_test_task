@@ -1,14 +1,10 @@
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from fastapi import Depends,Request,Response
-from fastapi.templating import Jinja2Templates
+from fastapi import Depends,Request
 from jose import jwt
 
 import dependencies
-import models
 import database
-
-# templates = Jinja2Templates(directory="templates")
+import models
 
 
 class Authenticate:

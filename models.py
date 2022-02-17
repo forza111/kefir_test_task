@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Text, Date, BOOLEAN
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, BOOLEAN
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import backref
 

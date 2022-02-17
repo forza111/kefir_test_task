@@ -3,9 +3,8 @@ import paginate_sqlalchemy
 
 import models
 from auth import Authenticate
-from fastapi import Response, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-
+from fastapi import Response
+from fastapi.responses import JSONResponse
 
 
 def get_users(db: Session, page_n, size):
@@ -21,8 +20,8 @@ def get_private_users(db: Session, page_n, size):
 # Уточнить, какие данные должны быть в "hint"
 
 def update_db_user(db: Session, id, update_user_body):
-    db.query(models.UserDetail).filter(models.UserDetail.id == id).update(update_user_body.dict(exclude_defaults=True),
-                                                                          synchronize_session=False)
+    db.query(models.UserDetail).filter(models.UserDetail.id == id).update(
+        update_user_body.dict(exclude_defaults=True), synchronize_session=False)
     db.commit()
     user = db.query(models.UserDetail).get(id)
     return user

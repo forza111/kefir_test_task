@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Field
 
 
 class UsersListElementModel(BaseModel):
@@ -13,7 +13,11 @@ class UsersListElementModel(BaseModel):
     class Config:
         orm_mode = True
 
-class UpdateUserResponseModel(UsersListElementModel):
+class UpdateUserResponseModel(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: str
     other_name: str
     phone: str
     birthday: date
@@ -99,7 +103,8 @@ class PrivateUsersListHintMetaModel(BaseModel):
 class UsersListMetaDataModel(BaseModel):
     pagination: PaginatedMetaDataModel
 
-class PrivateUsersListMetaDataModel(UsersListMetaDataModel):
+class PrivateUsersListMetaDataModel(BaseModel):
+    pagination: PaginatedMetaDataModel
     hint: PrivateUsersListHintMetaModel
 
 class UsersListResponseModel(BaseModel):
@@ -107,6 +112,7 @@ class UsersListResponseModel(BaseModel):
     meta: UsersListMetaDataModel
 
 class PrivateUsersListResponseModel(UsersListResponseModel):
+    data: List[UsersListElementModel]
     meta: PrivateUsersListMetaDataModel
 
 class ErrorResponseModel(BaseModel):
