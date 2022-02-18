@@ -43,7 +43,6 @@ def update_private_db_user(db: Session, id, update_user_body):
     user = db.query(models.UserDetail).get(new_id)
     return user
 
-
 def get_user_detail(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()
     return user

@@ -1,4 +1,4 @@
-from fastapi import Request, APIRouter, Depends,Response
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -9,74 +9,10 @@ import responses
 import schemas
 
 
-app = APIRouter(tags=["notes"])
+router = APIRouter(prefix='/private', tags=["admin"])
 
 
-@app.post("/login",
-          response_model=schemas.CurrentUserResponseModel,
-          responses={400: {"model": schemas.ErrorResponseModel}}
-          )
-async def login(request: Request,body_user: schemas.LoginModel,response: Response, db: Session = Depends(get_db)):
-    user = Authenticate.get_user_by_login(db,body_user.login)
-    if user is None or not Authenticate.verify_password(body_user.password, user.password):
-        return JSONResponse(status_code=400, content={"code": 400, "message": "Wrong login or password"})
-    if Authenticate.verify_password(body_user.password, user.password):
-        data = {"sub": body_user.login}
-        token = Authenticate.create_access_token(data,request)
-        response.set_cookie(key="access_token", value=f"Bearer {token}", httponly=True)
-        return user.user_detail
-
-
-@app.get("/logout")
-async def logout(response: Response):
-    response.delete_cookie(key="access_token")
-    response.status_code = 200
-    return response
-
-
-@app.get("/users/current", response_model=schemas.CurrentUserResponseModel, responses=responses.get_users_current)
-async def get_current_user(
-        current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
-        db: Session = Depends(get_db)
-        ):
-    if current_user is None:
-        return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
-    return current_user.user_detail
-
-
-@app.get("/users", response_model=schemas.UsersListResponseModel, responses=responses.get_users)
-async def get_users(
-        page: int,
-        size: int,
-        current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
-        db: Session = Depends(get_db)
-        ):
-    if current_user is None:
-        return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
-    users = crud.get_users(db, page, size)
-    return users
-
-
-@app.patch("/users/{pk}", response_model=schemas.UpdateUserResponseModel, responses=responses.patch_users_pk)
-async def edit_user(
-        pk: int,
-        update_user_body: schemas.UpdateUserModel,
-        current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
-        db: Session = Depends(get_db)
-        ):
-    if current_user is None:
-        return JSONResponse(status_code=401, content={"title": "Response 401 Current User Users Current Get"})
-    request_user = crud.get_user_detail(db, pk)
-    if request_user is None:
-        return JSONResponse(status_code=404, content={"title": "Response 404 Edit User Users  Pk  Patch"})
-    if current_user.id != pk:
-        return JSONResponse(status_code=400, content={"code": 400,
-                                                      "message": "The user can only change their information"})
-    update_user = crud.update_db_user(db, pk, update_user_body)
-    return update_user
-
-
-@app.get("/private/users", response_model=schemas.PrivateUsersListResponseModel, responses=responses.get_private_users)
+@router.get("/users", response_model=schemas.PrivateUsersListResponseModel, responses=responses.get_private_users)
 async def private_users(
         page: int,
         size: int,
@@ -91,7 +27,7 @@ async def private_users(
     return users
 
 
-@app.post("/private/users",
+@router.post("/users",
           response_model=schemas.PrivateDetailUserResponseModel,
           responses=responses.post_private_users
           )
@@ -117,7 +53,7 @@ async def private_create_users(
     return create_user
 
 
-@app.get("/private/users/{pk}",
+@router.get("/users/{pk}",
          response_model=schemas.PrivateDetailUserResponseModel,
          responses=responses.get_private_users_pk
          )
@@ -136,7 +72,7 @@ async def get_users(
     return user
 
 
-@app.delete("/private/users/{pk}", status_code=204, responses=responses.delete_private_users_pk)
+@router.delete("/users/{pk}", status_code=204, responses=responses.delete_private_users_pk)
 async def private_delete_user(
         pk: int,
         current_user: schemas.LoginModel = Depends(Authenticate.get_current_user),
@@ -155,7 +91,7 @@ async def private_delete_user(
     return crud.delete_user(db, delete_user)
 
 
-@app.patch("/private/users/{pk}",
+@router.patch("/users/{pk}",
            response_model=schemas.PrivateDetailUserResponseModel,
            responses=responses.patch_private_users_pk)
 async def private_patch_user(

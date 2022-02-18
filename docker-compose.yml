@@ -9,6 +9,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=test_db
+    container_name: kefir_test_task_db_1
 
   web:
     build: .
