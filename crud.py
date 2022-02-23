@@ -83,3 +83,10 @@ def delete_user(db: Session, delete_user):
     db.commit()
     db.close()
     return Response(status_code=204)
+
+def create_city(db: Session, city):
+    db_city = models.City(**city.dict())
+    db.add(db_city)
+    db.commit()
+    db.refresh(db_city)
+    return db_city
