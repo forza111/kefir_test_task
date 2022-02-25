@@ -7,6 +7,17 @@ from fastapi import Response
 from fastapi.responses import JSONResponse
 
 
+required_not_empty_update_fields = ['first_name', 'last_name', 'email']
+
+def check_required_fields_for_empty_values(update_body):
+    body_keys = update_body.keys()
+    req_fields_in_body = [i for i in required_not_empty_update_fields if i in body_keys]
+    empty_fiels = [key for key in req_fields_in_body if not bool(update_body.get(key))]
+    if empty_fiels:
+        return JSONResponse(status_code=400, content={
+            "code": 400,
+            "message": f"field(s) {','.join(empty_fiels)} cannot have an empty value"})
+
 def get_users(db: Session, page_n, size):
     users = db.query(models.UserDetail)
     page = paginate_sqlalchemy.SqlalchemyOrmPage(users, page=page_n, items_per_page=size,db_session=db)
@@ -20,28 +31,52 @@ def get_private_users(db: Session, page_n, size):
 # Уточнить, какие данные должны быть в "hint"
 
 def update_db_user(db: Session, id, update_user_body):
-    db.query(models.UserDetail).filter(models.UserDetail.id == id).update(
-        update_user_body.dict(exclude_defaults=True), synchronize_session=False)
-    db.commit()
-    user = db.query(models.UserDetail).get(id)
-    return user
-
-def update_private_db_user(db: Session, id, update_user_body):
-    update_user_detail_body_dict = update_user_body.dict(exclude_defaults=True)
-    new_id = update_user_detail_body_dict.pop("id")
+    update_user_detail_body_dict = update_user_body.dict(exclude_unset=True)
     email = update_user_detail_body_dict.get("email")
-    if id != new_id:
-        db.query(models.User).filter(models.User.id == id).update({"id": new_id}, synchronize_session=False)
-        db.commit()
     if email:
         if get_user_by_email(db, email):
-            return JSONResponse(status_code=400, content={"code":400,
-                                                          "message": f"User with this email already exists"})
-    db.query(models.UserDetail).filter(models.UserDetail.id == id).update(update_user_detail_body_dict,
-                                                                          synchronize_session=False)
-    db.commit()
-    user = db.query(models.UserDetail).get(new_id)
-    return user
+            return JSONResponse(status_code=400, content={"code": 400,
+                                                          "message": f"User with this email already exist"})
+    empty_required_fiels = check_required_fields_for_empty_values(update_user_detail_body_dict)
+    if empty_required_fiels:
+        return empty_required_fiels
+
+    if update_user_detail_body_dict:
+        db.query(models.UserDetail).filter(models.UserDetail.id == id).update(
+            update_user_body.dict(exclude_unset=True), synchronize_session=False)
+        db.commit()
+    user_detail = get_user_detail(db, id)
+    return user_detail
+
+def update_private_db_user(db: Session, id, update_user_body):
+    update_user_detail_body_dict = update_user_body.dict(exclude_unset=True)
+    new_id = update_user_detail_body_dict.pop("id")
+    email = update_user_detail_body_dict.get("email")
+
+    if id != new_id:
+        exist_user = get_user(db, new_id)
+        if exist_user:
+            return JSONResponse(status_code=400, content={"code": 400,
+                                                          "message": f"User with this id already exist"})
+        db.query(models.User).filter(models.User.id == id).update({"id": new_id}, synchronize_session=False)
+        db.commit()
+
+    if email:
+        if get_user_by_email(db, email):
+            return JSONResponse(status_code=400, content={"code": 400,
+                                                          "message": f"User with this email already exist"})
+
+    empty_required_fiels = check_required_fields_for_empty_values(update_user_detail_body_dict)
+    if empty_required_fiels:
+        return empty_required_fiels
+
+    if update_user_detail_body_dict:
+        db.query(models.UserDetail).filter(models.UserDetail.id == new_id).update(update_user_detail_body_dict,
+                                                                              synchronize_session=False)
+        db.commit()
+
+    user_detail = get_user_detail(db, new_id)
+    return user_detail
 
 def get_user_detail(db: Session, pk):
     user = db.query(models.UserDetail).filter(models.UserDetail.id == pk).first()

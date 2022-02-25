@@ -10,9 +10,9 @@ import schemas
 router = APIRouter(tags=["auth"])
 
 @router.post("/login",
-          response_model=schemas.CurrentUserResponseModel,
-          responses={400: {"model": schemas.ErrorResponseModel}}
-          )
+             response_model=schemas.CurrentUserResponseModel,
+             responses={400: {"model": schemas.ErrorResponseModel}}
+             )
 async def login(request: Request,body_user: schemas.LoginModel,response: Response, db: Session = Depends(get_db)):
     user = Authenticate.get_user_by_login(db,body_user.login)
     if user is None or not Authenticate.verify_password(body_user.password, user.password):

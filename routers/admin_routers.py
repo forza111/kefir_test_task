@@ -42,11 +42,11 @@ async def private_create_users(
         return JSONResponse(status_code=403, content={"title": "Response 403 Private Create Users Private Users Post"})
     if Authenticate.get_user_by_login(db,create_user_body.login):
         return JSONResponse(status_code=400, content={"code":400,
-                                                      "message": "User with this login already exists"})
+                                                      "message": "User with this login already exist"})
     if Authenticate.get_user_detail_by_email(db,create_user_body.email):
         return JSONResponse(status_code=400, content={"code":400,
-                                                      "message": "User with this email already exists"})
-    if crud.get_city(db,create_user_body.city) is None:
+                                                      "message": "User with this email already exist"})
+    if create_user_body.city and crud.get_city(db,create_user_body.city) is None:
         return JSONResponse(status_code=400, content={"code":400,
                                                       "message": f"City {create_user_body.city} does not exist"})
     create_user = crud.create_db_user(db, create_user_body)

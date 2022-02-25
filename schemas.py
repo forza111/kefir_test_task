@@ -18,9 +18,9 @@ class UpdateUserResponseModel(BaseModel):
     first_name: str
     last_name: str
     email: str
-    other_name: str
-    phone: str
-    birthday: date
+    other_name: Optional[str] = None
+    phone: Optional[str] = None
+    birthday: Optional[date] = None
 
     class Config:
         orm_mode = True
@@ -43,11 +43,11 @@ class PrivateDetailUserResponseModel(BaseModel):
 class CurrentUserResponseModel(BaseModel):
     first_name: str
     last_name: str
-    other_name: str
+    other_name: Optional[str] = None
     email: str
-    phone: str
-    birthday: date
-    is_admin: bool
+    phone: Optional[str] = None
+    birthday: Optional[date] = None
+    is_admin: Optional[bool] = None
 
     class Config:
         orm_mode = True
