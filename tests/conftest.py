@@ -1,15 +1,11 @@
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import Session
 import pytest
 
-import database
-import main
-import models
-import crud
-import schemas
-
+from db import database
+from core import main
+from apps import crud, schemas
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -52,4 +48,4 @@ def create_items(db):
         city=1,
         additional_info="I'm an engineer",
         is_admin=True)
-    )
+                        )

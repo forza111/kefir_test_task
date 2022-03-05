@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
-from routers import admin_routers,auth_routers,user_routers
-
+from api.routers import user_routers, auth_routers, admin_routers
 
 app = FastAPI()
 app.include_router(admin_routers.router)

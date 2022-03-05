@@ -1,5 +1,4 @@
-import schemas
-
+from apps import schemas
 
 get_users_current = {
     400: {"model": schemas.ErrorResponseModel},

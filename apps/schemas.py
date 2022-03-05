@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field
 
 
 class UsersListElementModel(BaseModel):
-    id: int
     first_name: str
     last_name: str
     email: str
@@ -14,7 +13,6 @@ class UsersListElementModel(BaseModel):
         orm_mode = True
 
 class UpdateUserResponseModel(BaseModel):
-    id: int
     first_name: str
     last_name: str
     email: str
@@ -53,11 +51,10 @@ class CurrentUserResponseModel(BaseModel):
         orm_mode = True
 
 class PrivateCreateUserModel(BaseModel):
-    login: str
+    email: str
     password: str
     first_name: str
     last_name: str
-    email: str
     other_name: Optional[str] = None
     phone: Optional[str] = None
     birthday: Optional[date] = None
@@ -77,7 +74,7 @@ class UpdateUserModel(BaseModel):
         orm_mode = True
 
 class PrivateUpdateUserModel(BaseModel):
-    id: int
+    id: Optional[int] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     other_name: Optional[str] = None
